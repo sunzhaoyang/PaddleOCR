@@ -21,14 +21,19 @@ import os.path
 import platform
 import subprocess
 import sys
-import xlrd
 from functools import partial
 
-from PyQt5.QtCore import QSize, Qt, QPoint, QByteArray, QTimer, QFileInfo, QPointF, QProcess
-from PyQt5.QtGui import QImage, QCursor, QPixmap, QImageReader
-from PyQt5.QtWidgets import QMainWindow, QListWidget, QVBoxLayout, QToolButton, QHBoxLayout, QDockWidget, QWidget, \
-    QSlider, QGraphicsOpacityEffect, QMessageBox, QListView, QScrollArea, QWidgetAction, QApplication, QLabel, QGridLayout, \
-    QFileDialog, QListWidgetItem, QComboBox, QDialog, QAbstractItemView, QSizePolicy
+import xlrd
+from PyQt5.QtCore import (QByteArray, QFileInfo, QPoint, QPointF, QProcess,
+                          QSize, Qt, QTimer)
+from PyQt5.QtGui import QCursor, QImage, QImageReader, QPixmap
+from PyQt5.QtWidgets import (QAbstractItemView, QApplication, QComboBox,
+                             QDialog, QDockWidget, QFileDialog,
+                             QGraphicsOpacityEffect, QGridLayout, QHBoxLayout,
+                             QLabel, QListView, QListWidget, QListWidgetItem,
+                             QMainWindow, QMessageBox, QScrollArea,
+                             QSizePolicy, QSlider, QToolButton, QVBoxLayout,
+                             QWidget, QWidgetAction)
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,22 +43,24 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../PaddleOCR')))
 sys.path.append("..")
 
 from paddleocr import PaddleOCR, PPStructure
-from libs.constants import *
-from libs.utils import *
-from libs.labelColor import label_colormap
-from libs.settings import Settings
-from libs.shape import Shape, DEFAULT_LINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_LOCK_COLOR
-from libs.stringBundle import StringBundle
-from libs.canvas import Canvas
-from libs.zoomWidget import ZoomWidget
+
 from libs.autoDialog import AutoDialog
-from libs.labelDialog import LabelDialog
+from libs.canvas import Canvas
 from libs.colorDialog import ColorDialog
-from libs.ustr import ustr
-from libs.hashableQListWidgetItem import HashableQListWidgetItem
+from libs.constants import *
 from libs.editinlist import EditInList
-from libs.unique_label_qlist_widget import UniqueLabelQListWidget
+from libs.hashableQListWidgetItem import HashableQListWidgetItem
 from libs.keyDialog import KeyDialog
+from libs.labelColor import label_colormap
+from libs.labelDialog import LabelDialog
+from libs.settings import Settings
+from libs.shape import (DEFAULT_FILL_COLOR, DEFAULT_LINE_COLOR,
+                        DEFAULT_LOCK_COLOR, Shape)
+from libs.stringBundle import StringBundle
+from libs.unique_label_qlist_widget import UniqueLabelQListWidget
+from libs.ustr import ustr
+from libs.utils import *
+from libs.zoomWidget import ZoomWidget
 
 __appname__ = 'PPOCRLabel'
 
@@ -2286,9 +2293,9 @@ class MainWindow(QMainWindow):
         '''
             Table Recegnition
         '''
-        from paddleocr import to_excel
-
         import time
+
+        from paddleocr import to_excel
 
         start = time.time()
         img = cv2.imread(self.filePath)
@@ -2702,7 +2709,7 @@ class MainWindow(QMainWindow):
     def change_box_key(self):
         if not self.kie_mode:
             return
-        key_text, _ = self.keyDialog.popUp(self.key_previous_text)
+        key_text, _ = self.keyDialog.popUp(self.key_previous_text,predefined_keys=self.labelHist)
         if key_text is None:
             return
         self.key_previous_text = key_text
@@ -2807,11 +2814,14 @@ def get_main_app(argv=[]):
     app.setWindowIcon(newIcon("app"))
     # Tzutalin 201705+: Accept extra arguments to change predefined class file
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--lang", type=str, default='en', nargs="?")
+    arg_parser.add_argument("--lang", type=str, default='ch', nargs="?")
     arg_parser.add_argument("--gpu", type=str2bool, default=True, nargs="?")
-    arg_parser.add_argument("--kie", type=str2bool, default=False, nargs="?")
+    arg_parser.add_argument("--kie", type=str2bool, default=True, nargs="?")
+    # arg_parser.add_argument("--predefined_classes_file",
+    #                         default=os.path.join(os.path.dirname(__file__), "data", "predefined_classes.txt"),
+    #                         nargs="?")
     arg_parser.add_argument("--predefined_classes_file",
-                            default=os.path.join(os.path.dirname(__file__), "data", "predefined_classes.txt"),
+                            default="/opt/dataset/invision/predefined_classes.txt",
                             nargs="?")
     args = arg_parser.parse_args(argv[1:])
 

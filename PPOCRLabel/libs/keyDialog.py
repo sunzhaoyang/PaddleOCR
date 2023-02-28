@@ -1,10 +1,9 @@
 import re
 
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QT_VERSION_STR
-from libs.utils import newIcon, labelValidator
+
+from libs.utils import labelValidator, newIcon
 
 QT5 = QT_VERSION_STR[0] == '5'
 
@@ -113,6 +112,14 @@ class KeyDialog(QtWidgets.QDialog):
         self.edit.setCompleter(completer)
 
     def addLabelHistory(self, label):
+        unused = ['','None']
+        for i in unused:
+            items = self.labelList.findItems(i,QtCore.Qt.MatchExactly)
+            if items:
+                for item in items:
+                    row = self.labelList.row(item)
+                    self.labelList.takeItem(row)
+
         if self.labelList.findItems(label, QtCore.Qt.MatchExactly):
             return
         self.labelList.addItem(label)
@@ -182,7 +189,7 @@ class KeyDialog(QtWidgets.QDialog):
             flags[item.text()] = item.isChecked()
         return flags
 
-    def popUp(self, text=None, move=True, flags=None):
+    def popUp(self, text=None, move=True, flags=None,predefined_keys:list =None):
         if self._fit_to_content["row"]:
             self.labelList.setMinimumHeight(
                 self.labelList.sizeHintForRow(0) * self.labelList.count() + 2
@@ -200,6 +207,10 @@ class KeyDialog(QtWidgets.QDialog):
             self.resetFlags(text)
         self.edit.setText(text)
         self.edit.setSelection(0, len(text))
+
+        if predefined_keys:
+            for key in predefined_keys:
+                self.addLabelHistory(key)
 
         items = self.labelList.findItems(text, QtCore.Qt.MatchFixedString)
         if items:

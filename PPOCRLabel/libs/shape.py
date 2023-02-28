@@ -16,7 +16,8 @@ import math
 import sys
 
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QColor, QPen, QPainterPath, QFont
+from PyQt5.QtGui import QColor, QFont, QPainterPath, QPen
+
 from libs.utils import distance
 
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
@@ -165,6 +166,23 @@ class Shape(object):
                     if min_y < MIN_Y_LABEL:
                         min_y += MIN_Y_LABEL
                     painter.drawText(min_x, min_y, self.label)
+            # Draw key_cls
+            if self.key_cls:
+                min_x = sys.maxsize
+                min_y = sys.maxsize
+                for point in self.points:
+                    min_x = min(min_x, point.x())
+                    min_y = min(min_y, point.y())
+                if min_x != sys.maxsize and min_y != sys.maxsize:
+                    font = QFont()
+                    font.setPointSize(self.fontsize)
+                    font.setBold(True)
+                    painter.setFont(font)
+                    if self.key_cls == 'None':
+                        self.key_cls = ''
+                    if min_y < MIN_Y_LABEL:
+                        min_y += MIN_Y_LABEL
+                    painter.drawText(min_x, min_y, self.key_cls)
 
             # Draw number at the top-right
             if self.paintIdx:
